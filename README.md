@@ -1,0 +1,4 @@
+vad
+===
+
+VAD implementation
