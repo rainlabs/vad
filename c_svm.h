@@ -20,7 +20,8 @@ public:
 
     void load();
 
-    int train( std::vector< std::vector<double> > data, std::vector<double> cls);
+    int train( std::vector< std::vector<double> > data, std::vector<int> cls);
+    double recognize( std::vector<double> input );
 
 protected:
     void initialize(int num_features, const char* filename);
@@ -32,6 +33,8 @@ protected:
     }
 
 private:
+    void cleanModel();
+
     struct svm_parameter mParam;
     struct svm_model*    mModel;
     int                  mFeaturesCount;

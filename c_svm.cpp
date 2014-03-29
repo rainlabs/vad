@@ -24,12 +24,16 @@ SVM::SVM(int num_features, const char* filename)
     initialize(num_features, filename);
 }
 
-int SVM::train( std::vector< std::vector<double> > data, std::vector<double> cls)
+int SVM::train( std::vector< std::vector<double> > data, std::vector<int> cls)
 {
     struct svm_node* xSpace;
     struct svm_problem* problem;
     int i, j, n = 0;
     const char* errorMsg;
+
+    initialize(mFeaturesCount, mFileName);
+
+    cleanModel();
 
     problem = problemInitialize( data.size() );
     xSpace = Malloc(struct svm_node, mFeaturesCount * problem->l + problem->l);
@@ -62,17 +66,26 @@ int SVM::train( std::vector< std::vector<double> > data, std::vector<double> cls
         return 2;
     }
 
-//    svm_free_and_destroy_model(&mModel);
-//    mModel = nullptr;
-
-//    for(i = 0; i < problem->l; i++) {
-//        free(problem->x[i]);
-//    }
-//    free(problem->y);
-//    free(problem->x);
-//    free(problem);
+    free(problem->y);
+    free(problem->x);
+    free(problem);
 
     return 0;
+}
+
+double SVM::recognize( std::vector<double> input )
+{
+    struct svm_node* xSpace;
+    int i;
+    xSpace = Malloc(struct svm_node, mFeaturesCount + 1);
+
+    for(i = 0; i < mFeaturesCount; i++) {
+        xSpace[i].index = i + 1;
+        xSpace[i].value = input[i];
+    }
+    xSpace[i].index = -1;
+
+    return svm_predict(mModel, xSpace);
 }
 
 //protected:
@@ -113,4 +126,13 @@ void SVM::initialize(int num_features, const char* filename)
     mParam.weight_label = nullptr;
     mParam.weight = nullptr;
 //	cross_validation = 0;
+}
+
+// private:
+
+void SVM::cleanModel()
+{
+    if (mModel != nullptr)
+        svm_free_and_destroy_model(&mModel);
+    mModel = nullptr;
 }
