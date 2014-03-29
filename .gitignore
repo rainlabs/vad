@@ -12,5 +12,8 @@
 *.la
 *.a
 
-# QT
-*.pro.user
+# executable
+vad
+
+# netbeans
+nbproject/
