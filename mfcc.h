@@ -10,7 +10,7 @@ class MFCC
 {
 public:
     #ifdef UNIT_TEST
-    friend MFCCTest;
+    friend class MFCCTest;
     #endif
 
     MFCC(int windowSize = 512, int overlapSize = 256, int filtersCount = 32, int mfccCount = 16);
