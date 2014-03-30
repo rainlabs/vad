@@ -12,8 +12,16 @@ public:
     MFCC();
     MFCC(std::string filename);
 
+    /**
+     * @brief load sound file
+     * @param filename
+     */
     void load(std::string filename);
 
+    /**
+     * @brief extract MFCC features
+     * @return 
+     */
     std::vector< std::vector<double> > extract();
 
 protected:
