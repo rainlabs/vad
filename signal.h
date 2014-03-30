@@ -2,19 +2,30 @@
 #define SIGNAL_HPP
 
 #include <string>
-#include <SFML/Audio/SoundBuffer.hpp>
+#include <sndfile.h>
+//#include <SFML/Audio/SoundBuffer.hpp>
 //#include <SFML/Audio/Sound.hpp>
 
 /**
- * @brief The Signal class as sound buffer
+ * @brief The Signal class as sound reader
  */
-class Signal : public sf::SoundBuffer
+class Signal
 {
 public:
-    Signal() : SoundBuffer() {}
-    Signal(const SoundBuffer &copy) : SoundBuffer(copy) {}
-
-    double getLittleEndian(int index);
+    Signal();
+    virtual ~Signal();
+    
+    int getChannelCount();
+    std::size_t getSampleCount();
+    int getSampleRate();
+    
+    bool loadFromFile(const std::string& filename );
+    int readNext(double* value);
+    void rewind();
+private:
+    void clean();
+    SNDFILE* mSoundFile;
+    SF_INFO* mSoundInfo;
 };
 
 #endif // SIGNAL_HPP

@@ -21,7 +21,6 @@ void MFCC::load(std::string filename)
     std::cout << "file info:" << std::endl;
     std::cout << "file name: " << filename << std::endl;
     std::cout << "channels: " << mStream->getChannelCount() << std::endl;
-    std::cout << "duration (seconds): " << mStream->getDuration().asMilliseconds() / 1000 << std::endl;
     std::cout << "sample rate: " << mStream->getSampleRate() << std::endl;
     std::cout << "sample count: " << mStream->getSampleCount()  << std::endl;
 }
@@ -34,10 +33,11 @@ std::vector< std::vector<double> > MFCC::extract()
     M = mWindowSize / 2;
     N = mWindowSize;
 
-    for(i = 0; i < mStream->getSampleCount(); i++) {
-        s.push_back( mStream->getLittleEndian(i) );
-//        std::cout << "typecast:" << mStream->getSamples()[i] << ":" << s.back() << std::endl;
+    double* val = new double;
+    while( mStream->readNext(val) != 0 ) {
+        s.push_back( *val );
     }
+    mStream->rewind();
 
     // add to full frame size
     n = mWindowSize - (s.size() % mWindowSize);

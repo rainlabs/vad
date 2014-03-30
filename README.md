@@ -7,7 +7,7 @@ DEPENDENCIES
 ===
 
 * libSVM - http://www.csie.ntu.edu.tw/~cjlin/libsvm/
-* SFML   - http://www.sfml-dev.org/
+* libsndfile - http://www.mega-nerd.com/libsndfile/
 
 
 CURRENT STATUS

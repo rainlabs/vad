@@ -2,6 +2,7 @@
 #define MFCC_H
 
 #include <string>
+#include <vector>
 #include <iostream>
 #include <math.h>
 #include "signal.h"

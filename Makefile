@@ -1,7 +1,7 @@
 CC         = gcc
 CXX        = g++
 CXXFLAGS   = -c -Wall -std=c++0x
-LDFLAGS    = -lsfml-system -lsfml-audio -lsvm
+LDFLAGS    = -lsndfile -lsvm
 SOURCES    = vad.cpp signal.cpp window.cpp c_svm.cpp mfcc.cpp
 INCLUDES   = -I./
 HEADERS    = signal.h window.h c_svm.h mfcc.h

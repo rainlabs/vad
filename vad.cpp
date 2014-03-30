@@ -45,6 +45,8 @@ void VAD::initializeMFCC(int windowSize, int overlapSize, int filtersCount, int 
         delete mMFCC;
     
     mMFCC = new MFCC(windowSize, overlapSize, filtersCount, mfccCount);
+//    mMFCC->load("tests/fixtures/voice1.wav");
+//    mMFCC->extract();
 }
 void VAD::initializeSVM(int num_features) {
     if (mSVM != nullptr)
