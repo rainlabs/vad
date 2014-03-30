@@ -15,8 +15,8 @@
 class SVM
 {
 public:
-    SVM(const char* filename = nullptr);
-    SVM(int num_features, const char* filename = nullptr);
+    SVM(int num_features, const char* filename = "svm_db.dat");
+    virtual ~SVM();
 
     void load();
 

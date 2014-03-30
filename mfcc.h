@@ -9,8 +9,8 @@
 class MFCC
 {
 public:
-    MFCC();
-    MFCC(std::string filename);
+    MFCC(int windowSize = 512, int overlapSize = 256, int filtersCount = 32, int mfccCount = 16);
+    virtual ~MFCC();
 
     /**
      * @brief load sound file
@@ -27,24 +27,7 @@ public:
 protected:
     double freqToMel(double f);
     double melToFreq(double m);
-
-    size_t defaultFiltersCount() {
-        return 32;
-    }
-
-    size_t defaultMfccCount() {
-        return 16;
-    }
-
-    size_t defaultWindowSize() {
-        return 512;
-    }
-
-    size_t defaultOverlapSize() {
-        return 256;
-    }
-
-    void initialize(std::string filename);
+    void initialize(int windowSize, int overlapSize, int filtersCount, int mfccCount);
 
 private:
     Signal * mStream;

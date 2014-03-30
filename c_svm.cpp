@@ -1,27 +1,18 @@
 #include "c_svm.h"
 
-SVM::SVM(const char* filename)
-{
-    mModel = nullptr;
-    if (filename == nullptr)
-        mFileName = defaultFileName();
-    else
-        mFileName = filename;
-
-    load();
-}
-
 void SVM::load()
 {
-    if (mModel != nullptr)
-        svm_free_and_destroy_model(&mModel);
-
+    cleanModel();
     mModel = svm_load_model(mFileName);
 }
 
 SVM::SVM(int num_features, const char* filename)
 {
     initialize(num_features, filename);
+}
+
+SVM::~SVM() {
+    cleanModel();
 }
 
 int SVM::train( std::vector< std::vector<double> > data, std::vector<int> cls)
@@ -103,11 +94,7 @@ void SVM::initialize(int num_features, const char* filename)
 {
     mModel = nullptr;
     mFeaturesCount = num_features;
-
-    if (filename == nullptr)
-        mFileName = defaultFileName();
-    else
-        mFileName = filename;
+    mFileName = filename;
 
     // default values
     mParam.svm_type = C_SVC;

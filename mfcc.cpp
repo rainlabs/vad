@@ -1,18 +1,29 @@
 #include "mfcc.h"
 
 //public:
-MFCC::MFCC()
-{
+MFCC::MFCC(int windowSize, int overlapSize, int filtersCount, int mfccCount) {
+    initialize(windowSize, overlapSize, filtersCount, mfccCount);
 }
 
-MFCC::MFCC(std::string filename)
-{
-    initialize(filename);
+MFCC::~MFCC() {
+    if (mStream != nullptr)
+        delete mStream;
 }
 
 void MFCC::load(std::string filename)
 {
-    initialize(filename);
+    if (mStream != nullptr)
+        delete mStream;
+    
+    mStream = new Signal();
+    mStream->loadFromFile(filename);
+
+    std::cout << "file info:" << std::endl;
+    std::cout << "file name: " << filename << std::endl;
+    std::cout << "channels: " << mStream->getChannelCount() << std::endl;
+    std::cout << "duration (seconds): " << mStream->getDuration().asMilliseconds() / 1000 << std::endl;
+    std::cout << "sample rate: " << mStream->getSampleRate() << std::endl;
+    std::cout << "sample count: " << mStream->getSampleCount()  << std::endl;
 }
 
 std::vector< std::vector<double> > MFCC::extract()
@@ -116,21 +127,13 @@ double MFCC::melToFreq(double m)
     return (700.0 * (exp( m / 1127.0) - 1.0 ));
 }
 
-void MFCC::initialize(std::string filename)
+void MFCC::initialize(int windowSize, int overlapSize, int filtersCount, int mfccCount)
 {
-    mFiltersCount = defaultFiltersCount();
-    mMfccCount    = defaultMfccCount();
-    mWindowSize   = defaultWindowSize();
-    mOverlapSize  = defaultOverlapSize();
-
-    mStream = new Signal();
-    mStream->loadFromFile(filename);
-
-    std::cout << "file info:" << std::endl;
-    std::cout << "channels: " << mStream->getChannelCount() << std::endl;
-    std::cout << "duration (seconds): " << mStream->getDuration().asMilliseconds() / 1000 << std::endl;
-    std::cout << "sample rate: " << mStream->getSampleRate() << std::endl;
-    std::cout << "sample count: " << mStream->getSampleCount()  << std::endl;
+    mFiltersCount = filtersCount;
+    mMfccCount    = mfccCount;
+    mWindowSize   = windowSize;
+    mOverlapSize  = overlapSize;
+    mStream       = nullptr;
 }
 
 //private:
