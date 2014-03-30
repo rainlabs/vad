@@ -5,10 +5,12 @@
 #include <SFML/Audio/SoundBuffer.hpp>
 //#include <SFML/Audio/Sound.hpp>
 
+using namespace sf;
+
 /**
  * @brief The Signal class as sound buffer
  */
-class Signal : public sf::SoundBuffer
+class Signal : public SoundBuffer
 {
 public:
     Signal() : SoundBuffer() {}
