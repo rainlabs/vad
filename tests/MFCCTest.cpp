@@ -36,6 +36,15 @@ void MFCCTest::testInitialize() {
     CPPUNIT_ASSERT(mfcc->mStream->getSampleRate() == 9600);
 }
 
+void MFCCTest::testCustomInitialize() {
+    MFCC* mfcc = new MFCC(256, 128, 64, 20);
+    CPPUNIT_ASSERT(mfcc->mWindowSize   == 256);
+    CPPUNIT_ASSERT(mfcc->mOverlapSize  == 128);
+    CPPUNIT_ASSERT(mfcc->mFiltersCount == 64);
+    CPPUNIT_ASSERT(mfcc->mMfccCount    == 20);
+    CPPUNIT_ASSERT(mfcc->mStream       == nullptr);
+}
+
 void MFCCTest::testExtract() {
     MFCC* mfcc = new MFCC();
     mfcc->load("tests/fixtures/voice1.wav");

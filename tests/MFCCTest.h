@@ -18,6 +18,7 @@ class MFCCTest : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST_SUITE(MFCCTest);
 
     CPPUNIT_TEST(testInitialize);
+    CPPUNIT_TEST(testCustomInitialize);
     CPPUNIT_TEST(testExtract);
 
     CPPUNIT_TEST_SUITE_END();
@@ -30,6 +31,7 @@ public:
 
 private:
     void testInitialize();
+    void testCustomInitialize();
     void testExtract();
 };
 
