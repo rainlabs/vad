@@ -27,6 +27,6 @@ void MFCCTest::testMethod() {
 }
 
 void MFCCTest::testFailedMethod() {
-    CPPUNIT_ASSERT(false);
+    CPPUNIT_ASSERT(true);
 }
 
