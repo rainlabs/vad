@@ -13,7 +13,6 @@ class Signal : public sf::SoundBuffer
 public:
     Signal() : SoundBuffer() {}
     Signal(const SoundBuffer &copy) : SoundBuffer(copy) {}
-    ~Signal() {}
 
     double getLittleEndian(int index);
 };

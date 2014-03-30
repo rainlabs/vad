@@ -94,7 +94,7 @@ std::vector< std::vector<double> > MFCC::extract()
     for(n = 0; n < X.size(); n++) {
         std::vector<double> c_n;
         // FIXME j = 0 for first coefficient
-        for(j = 1; j < mMfccCount; j++) {
+        for(j = 0; j < mMfccCount; j++) {
             double sum = 0;
             for(k = 0; k < mFiltersCount; k++) {
                 // j instead j + 1

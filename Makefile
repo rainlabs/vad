@@ -2,7 +2,7 @@ CC         = gcc
 CXX        = g++
 CXXFLAGS   = -c -Wall -std=c++0x
 LDFLAGS    = -lsfml-system -lsfml-audio -lsvm
-SOURCES    = main.cpp vad.cpp signal.cpp window.cpp c_svm.cpp mfcc.cpp
+SOURCES    = vad.cpp signal.cpp window.cpp c_svm.cpp mfcc.cpp
 INCLUDES   = -I./
 HEADERS    = signal.h window.h c_svm.h mfcc.h
 OBJECTS    = $(SOURCES:.cpp=.o)
@@ -14,7 +14,7 @@ debug: CC += -DDEBUG -g
 ###
 
 ### Test ENVIRONMENT
-TEST_SRC = ./tests/MFCCTestRunner.cpp ./tests/MFCCTest.cpp
+TEST_SRC = ./tests/MFCCTestRunner.cpp ./tests/MFCCTest.cpp $(SOURCES)
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 TESTS    = $(EXECUTABLE)_test
 #test: INCLUDES += -I./tests/
@@ -25,20 +25,20 @@ $(TESTS): $(TEST_OBJ)
 ###
 
 all: release build-tests test
-release: $(SOURCES) $(EXECUTABLE)
+release: main.cpp $(SOURCES) $(EXECUTABLE)
 debug: release
 build-tests: $(TEST_SRC) $(TESTS)
 test:
 	./vad_test
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CXX) $(LDFLAGS) $(OBJECTS) -o $@
+$(EXECUTABLE): main.o $(OBJECTS)
+	$(CXX) $(LDFLAGS) main.o $(OBJECTS) -o $@
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -rf $(EXECUTABLE) $(OBJECTS) $(TESTS) $(TEST_OBJ) cppunitresults.xml
+	rm -rf $(EXECUTABLE) main.o $(OBJECTS) $(TESTS) $(TEST_OBJ) cppunitresults.xml
 
 
 ### NetBeans autogenerate
