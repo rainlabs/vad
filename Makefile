@@ -14,7 +14,7 @@ debug: CC += -DDEBUG -g
 ###
 
 ### Test ENVIRONMENT
-TEST_SRC = ./tests/MFCCTestRunner.cpp ./tests/MFCCTest.cpp $(SOURCES)
+TEST_SRC = ./tests/TestRunner.cpp ./tests/MFCCTest.cpp ./tests/SVMTest.cpp $(SOURCES)
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 TESTS    = $(EXECUTABLE)_test
 #test: INCLUDES += -I./tests/

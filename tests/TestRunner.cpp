@@ -1,5 +1,5 @@
 /*
- * File:   MFCCTestRunner.cpp
+ * File:   TestRunner.cpp
  * Author: rain
  *
  * Created on 30.03.2014, 19:28:27

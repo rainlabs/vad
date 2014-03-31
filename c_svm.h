@@ -15,6 +15,10 @@
 class SVM
 {
 public:
+    #ifdef UNIT_TEST
+    friend class SVMTest;
+    #endif
+
     SVM(int num_features, const char* filename = "svm_db.dat");
     virtual ~SVM();
 
@@ -26,11 +30,6 @@ public:
 protected:
     void initialize(int num_features, const char* filename);
     struct svm_problem* problemInitialize(int num_training_data);
-
-    const char* defaultFileName()
-    {
-        return (const char*) "svm_db.dat";
-    }
 
 private:
     void cleanModel();
