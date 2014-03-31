@@ -30,8 +30,8 @@ public:
     std::vector< std::vector<double> > extract();
 
 protected:
-    double freqToMel(double f);
-    double melToFreq(double m);
+    double hzToMel(double hz);
+    double melToHz(double mel);
     void initialize(int windowSize, int overlapSize, int filtersCount, int mfccCount);
 
 private:

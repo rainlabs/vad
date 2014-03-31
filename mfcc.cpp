@@ -63,12 +63,12 @@ std::vector< std::vector<double> > MFCC::extract()
         }
         P.push_back( A );
     }
-    double fMelLow  = freqToMel(0.0);
-    double fMelHigh = freqToMel( mStream->getSampleRate() / 2.0 );
+    double fMelLow  = hzToMel(0.0);
+    double fMelHigh = hzToMel( mStream->getSampleRate() / 2.0 );
     double len = (fMelHigh - fMelLow) / (mFiltersCount + 1.0);
 
     for(i = 0; i < mFiltersCount; i++) {
-        f_smp.push_back( melToFreq(fMelLow + (i+1.) * len) * M / (double) mStream->getSampleRate() );
+        f_smp.push_back( melToHz(fMelLow + (i+1.) * len) * M / (double) mStream->getSampleRate() );
     }
     // --check it---
 
@@ -117,14 +117,14 @@ std::vector< std::vector<double> > MFCC::extract()
 }
 
 //protected:
-double MFCC::freqToMel(double f)
+double MFCC::hzToMel(double hz)
 {
-    return (1127.0 * log( 1.0 + f / 700.0 ));
+    return (1127.0 * log( 1.0 + hz / 700.0 ));
 }
 
-double MFCC::melToFreq(double m)
+double MFCC::melToHz(double mel)
 {
-    return (700.0 * (exp( m / 1127.0) - 1.0 ));
+    return (700.0 * (exp( mel / 1127.0) - 1.0 ));
 }
 
 void MFCC::initialize(int windowSize, int overlapSize, int filtersCount, int mfccCount)
