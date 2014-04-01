@@ -3,9 +3,12 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
+#include <complex>
+#include <fftw3.h>
+#include <iostream> // TODO: remove
 #include <math.h>
 #include "signal.h"
+#define Malloc(type,n) (type *)fftw_malloc((n)*sizeof(type)) // from svm_train.c
 
 class MFCC
 {
@@ -32,6 +35,14 @@ public:
 protected:
     double hzToMel(double hz);
     double melToHz(double mel);
+    
+    /**
+     * @brief Split stram by ms and apply DFT based on libFFTW3
+     * @param ms as frame length in ms
+     * @return complex vectors
+     */
+    std::vector< std::vector< std::complex<double> > > dft(unsigned int ms=20);
+    
     void initialize(int windowSize, int overlapSize, int filtersCount, int mfccCount);
 
 private:

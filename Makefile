@@ -1,11 +1,12 @@
 CC         = gcc
 CXX        = g++
 CXXFLAGS   = -c -Wall -std=c++0x
-LDFLAGS    = -lsndfile -lsvm
+LDFLAGS    = -lsndfile -lfftw3 -lm -lsvm
 SOURCES    = vad.cpp signal.cpp window.cpp c_svm.cpp mfcc.cpp
 INCLUDES   = -I./
 HEADERS    = signal.h window.h c_svm.h mfcc.h
 OBJECTS    = $(SOURCES:.cpp=.o)
+BUILDDIR   = build
 EXECUTABLE = vad
 
 ### Debug ENVIRONMENT
@@ -38,7 +39,7 @@ $(EXECUTABLE): main.o $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -rf $(EXECUTABLE) main.o $(OBJECTS) $(TESTS) $(TEST_OBJ) cppunitresults.xml
+	rm -rf $(EXECUTABLE) main.o $(OBJECTS) $(TESTS) $(TEST_OBJ) cppunitresults.xml gnuplot_*
 
 
 ### NetBeans autogenerate

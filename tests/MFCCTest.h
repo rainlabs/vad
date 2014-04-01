@@ -12,14 +12,19 @@
 class MFCCTest;
 
 #include <cppunit/extensions/HelperMacros.h>
+#include <iostream>
+#include <math.h>
 #include "mfcc.h"
+#include "../vendor/gnuplot.hpp";
+//#include "vendor/gnuplot.hpp";
 
 class MFCCTest : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST_SUITE(MFCCTest);
 
     CPPUNIT_TEST(testInitialize);
-    CPPUNIT_TEST(testCustomInitialize);
+    CPPUNIT_TEST(testSignalRead);
     CPPUNIT_TEST(testExtract);
+    CPPUNIT_TEST(testDFT);
 
     CPPUNIT_TEST_SUITE_END();
 
@@ -30,9 +35,12 @@ public:
     void tearDown();
 
 private:
+    MFCC* mfcc;
     void testInitialize();
     void testCustomInitialize();
+    void testSignalRead();
     void testExtract();
+    void testDFT();
 };
 
 #endif	/* MFCCTEST_H */

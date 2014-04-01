@@ -127,6 +127,58 @@ double MFCC::melToHz(double mel)
     return (700.0 * (exp( mel / 1127.0) - 1.0 ));
 }
 
+std::vector< std::vector< std::complex<double> > > MFCC::dft(unsigned int ms) {
+    fftw_complex *in, *out;
+    fftw_plan plan;
+    int i, j;
+    int N = mStream->getSampleRate() * (double) ms / 1000.0; /* fft size by ms */
+    double* val = new double;
+    std::vector< std::vector< std::complex<double> > > ret;
+    
+    in =  Malloc(fftw_complex, N);
+    out = Malloc(fftw_complex, N);
+    plan = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+    
+    mStream->rewind();
+    i = 0;
+    while( mStream->readNext(val) != 0 ) {
+        in[i][0] = *val;
+        in[i][1] = 0;
+        i++;
+        if (i == N) {
+            i = 0;
+            fftw_execute(plan);
+            std::vector< std::complex<double> > line;
+            
+            for(j = 0; j < N / 2; j++) {
+                line.push_back( std::complex<double>(out[j][0], out[j][1]) );
+            }
+            ret.push_back(line);
+        }
+    }
+    /* if i not zero need fill in and fftw_execute */
+    if (i != 0) {
+        for(;i < N;i++) {
+            in[i][0] = 0;
+            in[i][1] = 0;
+        }
+        fftw_execute(plan);
+        std::vector< std::complex<double> > line;
+
+        for(j = 0; j < N / 2; j++) {
+            line.push_back( std::complex<double>(out[j][0], out[j][1]) );
+        }
+        ret.push_back(line);
+    }
+    mStream->rewind();
+    
+    fftw_destroy_plan(plan);
+    fftw_free(in);
+    fftw_free(out);
+    
+    return ret;
+}
+
 void MFCC::initialize(int windowSize, int overlapSize, int filtersCount, int mfccCount)
 {
     mFiltersCount = filtersCount;
