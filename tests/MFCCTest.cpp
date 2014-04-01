@@ -54,7 +54,6 @@ void MFCCTest::testDFT() {
     float n = dft.size();
     float hzInterval = 1000.0 / ms;
     
-    Gnuplot g;
     FILE * file = fopen((filename + ".dat").data(), "wb");
     fwrite(&n, sizeof(float), 1, file);
     for(i = 0; i < dft.size(); i++) {
@@ -71,9 +70,13 @@ void MFCCTest::testDFT() {
         }
     }
     fclose(file);
-    g.cmd("set terminal png size 1920, 1080");
-    g.cmd(("set output \"" + filename + ".png\""));
-    g.cmd( ("plot \"" + filename + ".dat\" binary matrix with image") );
+    try {
+        Gnuplot g;
+        g.cmd("set terminal png size 1920, 1080");
+        g.cmd(("set output \"" + filename + ".png\""));
+        g.cmd( ("plot \"" + filename + ".dat\" binary matrix with image") );
+    }
+    
     /* FIXME: need to remove after plot*/
 //    remove((filename + ".dat").data());
 }
