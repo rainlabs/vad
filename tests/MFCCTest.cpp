@@ -75,6 +75,8 @@ void MFCCTest::testDFT() {
         g.cmd("set terminal png size 1920, 1080");
         g.cmd(("set output \"" + filename + ".png\""));
         g.cmd( ("plot \"" + filename + ".dat\" binary matrix with image") );
+    } catch (GnuplotException ge) {
+        std::cout << ge.what() << std::endl;
     }
     
     /* FIXME: need to remove after plot*/
