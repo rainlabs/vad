@@ -27,7 +27,7 @@ public:
      */
     static std::vector< std::string > listDir(std::string path);
     
-    void initializeMFCC(int windowSize = 512, int overlapSize = 256, int filtersCount = 32, int mfccCount = 16);
+    void initializeMFCC(int interval = 10, int filtersCount = 32, int mfccCount = 16);
     void initializeSVM(int num_features = 16);
     
 private:

@@ -40,12 +40,13 @@ std::vector< std::string > VAD::listDir(std::string path) {
     return files;
 }
 
-void VAD::initializeMFCC(int windowSize, int overlapSize, int filtersCount, int mfccCount) {
+void VAD::initializeMFCC(int interval, int filtersCount, int mfccCount) {
     if (mMFCC != nullptr)
         delete mMFCC;
     
-    mMFCC = new MFCC(windowSize, overlapSize, filtersCount, mfccCount);
-//    mMFCC->load("tests/fixtures/voice1.wav");
+    mMFCC = new MFCC(interval, filtersCount, mfccCount);
+//    mMFCC->load("tests/fixtures/mike.wav");
+//    mMFCC->trifBank();
 //    mMFCC->extract();
 }
 void VAD::initializeSVM(int num_features) {

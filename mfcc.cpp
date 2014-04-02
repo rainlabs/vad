@@ -1,8 +1,8 @@
 #include "mfcc.h"
 
 //public:
-MFCC::MFCC(int windowSize, int overlapSize, int filtersCount, int mfccCount) {
-    initialize(windowSize, overlapSize, filtersCount, mfccCount);
+MFCC::MFCC(int duration, int filtersCount, int mfccCount) {
+    initialize(duration, filtersCount, mfccCount);
 }
 
 MFCC::~MFCC() {
@@ -17,6 +17,7 @@ void MFCC::load(std::string filename)
     
     mStream = new Signal();
     mStream->loadFromFile(filename);
+    mFftSize = mStream->getSampleRate() * mDuration / 1000.0;
 
     std::cout << "file info:" << std::endl;
     std::cout << "file name: " << filename << std::endl;
@@ -25,95 +26,27 @@ void MFCC::load(std::string filename)
     std::cout << "sample count: " << mStream->getSampleCount()  << std::endl;
 }
 
-std::vector< std::vector<double> > MFCC::extract()
+vector2d MFCC::extract()
 {
-    std::vector<double> s, f_smp;
-    std::vector< std::vector<double> > S, P, X, C_ret;
-    int i, k, j, n, m, M, N;
-    M = mWindowSize / 2;
-    N = mWindowSize;
-
-    double* val = new double;
-    while( mStream->readNext(val) != 0 ) {
-        s.push_back( *val );
-    }
-    mStream->rewind();
-
-    // add to full frame size
-    n = mWindowSize - (s.size() % mWindowSize);
-    for(i = 0; i < n; i++) {
-        s.push_back(0.0);
-    }
-
-    int prev = mOverlapSize;
-    for(i = 0; i < (s.size() / mOverlapSize - 1); i++) {
-        prev += mOverlapSize;
-        S.push_back( std::vector<double>(s.begin() + prev - mWindowSize, s.begin() + prev ) );
-    }
-
-    for(n = 0; n < S.size(); n++) {
-        std::vector<double> A;
-        for(k = 0; k < M; k++) {
-            double sumRe = 0, sumIm = 0;;
-            for(i = 0; i < N; i++) {
-                sumRe += S[n][i] * cos( 2.0 * M_PI * (k + 1.0) * (double)i/N  );
-                sumIm += S[n][i] * sin( 2.0 * M_PI * (k + 1.0) * (double)i/N  );
-            }
-            A.push_back( pow((2.0 / N) * sumRe, 2.0) + pow((-2.0 / N) * sumIm, 2.0) );
-        }
-        P.push_back( A );
-    }
-    double fMelLow  = hzToMel(0.0);
-    double fMelHigh = hzToMel( mStream->getSampleRate() / 2.0 );
-    double len = (fMelHigh - fMelLow) / (mFiltersCount + 1.0);
-
-    for(i = 0; i < mFiltersCount; i++) {
-        f_smp.push_back( melToHz(fMelLow + (i+1.) * len) * M / (double) mStream->getSampleRate() );
-    }
-    // --check it---
-
-    for(n = 0; n < P.size(); n++) {
-        std::vector<double> x_n;
-        for(i = 0; i < mFiltersCount; i++) {
+    int i, k;
+    auto P = dft();
+    auto H = trifBank();
+    vector2d ret, X;
+    
+    for(auto p_n : P) {
+        std::vector<double> vec;
+        for(auto h_i : H) {
             double sum = 0;
-            for(k = 0; k < M; k++) {
-                double H = 0;
-                if ((i != 0) && (f_smp[i-1] <= k) && (k <= f_smp[i])) {
-                    H = (k - f_smp[i-1]) / (f_smp[i] - f_smp[i-1]);
-                } else if ((i != mFiltersCount-1) && (f_smp[i] <= k) && (k <= f_smp[i+1])) {
-                    H = (f_smp[i+1] - k) / (f_smp[i+1] - f_smp[i]);
-                }
-
-                sum += P[n][k] * H;
+            for(k = 0; k < p_n.size(); k++) {
+                sum += p_n[k] * h_i[k];
             }
-            x_n.push_back( log(sum) );
+            vec.push_back(log(sum));
         }
-        X.push_back( x_n );
+        X.push_back(vec);
     }
-
-    for(n = 0; n < X.size(); n++) {
-        std::vector<double> c_n;
-        // FIXME j = 0 for first coefficient
-        for(j = 0; j < mMfccCount; j++) {
-            double sum = 0;
-            for(k = 0; k < mFiltersCount; k++) {
-                // j instead j + 1
-                sum += X[n][k] * cos( j * (k + 0.5) * M_PI / mFiltersCount );
-            }
-            c_n.push_back( sum );
-        }
-        C_ret.push_back(c_n);
-    }
-
-    for(i = 0; i < C_ret.size(); i++) {
-        std::cout << "row " << i << ": ";
-        for(j = 0; j < C_ret[i].size(); j++) {
-            std::cout << C_ret[i][j] << ",";
-        }
-        std::cout << std::endl;
-    }
-
-    return C_ret;
+    
+    return X;
+//    return ret;
 }
 
 //protected:
@@ -127,17 +60,16 @@ double MFCC::melToHz(double mel)
     return (700.0 * (exp( mel / 1127.0) - 1.0 ));
 }
 
-std::vector< std::vector< std::complex<double> > > MFCC::dft(unsigned int ms) {
+vector2d MFCC::dft() {
     fftw_complex *in, *out;
     fftw_plan plan;
     int i, j;
-    int N = mStream->getSampleRate() * (double) ms / 1000.0; /* fft size by ms */
     double* val = new double;
-    std::vector< std::vector< std::complex<double> > > ret;
+    vector2d ret;
     
-    in =  Malloc(fftw_complex, N);
-    out = Malloc(fftw_complex, N);
-    plan = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+    in =  Malloc(fftw_complex, mFftSize);
+    out = Malloc(fftw_complex, mFftSize);
+    plan = fftw_plan_dft_1d(mFftSize, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
     
     mStream->rewind();
     i = 0;
@@ -145,28 +77,28 @@ std::vector< std::vector< std::complex<double> > > MFCC::dft(unsigned int ms) {
         in[i][0] = *val;
         in[i][1] = 0;
         i++;
-        if (i == N) {
+        if (i == mFftSize) {
             i = 0;
             fftw_execute(plan);
-            std::vector< std::complex<double> > line;
+            std::vector< double > line;
             
-            for(j = 0; j < N / 2; j++) {
-                line.push_back( std::complex<double>(out[j][0], out[j][1]) );
+            for(j = 0; j < mFftSize/2; j++) {
+                line.push_back( std::abs(std::complex<double>(out[j][0], out[j][1])) );
             }
             ret.push_back(line);
         }
     }
     /* if i not zero need fill in and fftw_execute */
     if (i != 0) {
-        for(;i < N;i++) {
+        for(;i < mFftSize;i++) {
             in[i][0] = 0;
             in[i][1] = 0;
         }
         fftw_execute(plan);
-        std::vector< std::complex<double> > line;
+        std::vector< double > line;
 
-        for(j = 0; j < N / 2; j++) {
-            line.push_back( std::complex<double>(out[j][0], out[j][1]) );
+        for(j = 0; j < mFftSize/2; j++) {
+            line.push_back( std::abs(std::complex<double>(out[j][0], out[j][1])) );
         }
         ret.push_back(line);
     }
@@ -179,13 +111,44 @@ std::vector< std::vector< std::complex<double> > > MFCC::dft(unsigned int ms) {
     return ret;
 }
 
-void MFCC::initialize(int windowSize, int overlapSize, int filtersCount, int mfccCount)
+vector2d MFCC::trifBank() {
+    float fLow = hzToMel(0);
+    float fHigh = hzToMel(mStream->getSampleRate() / 2.);
+    int M = mFftSize / 2;
+    std::vector< double > C;
+    float tmp, interval = 1000.0 / mDuration;
+    float len = (fHigh - fLow) / (mFiltersCount + 1.);
+    int i,k;
+    vector2d ret;
+    
+    for(i = 0; i < mFiltersCount + 1; i++) {
+        C.push_back( melToHz(fLow + (i+1) * len) );
+    }
+    
+    for(i = 0; i < mFiltersCount; i++) {
+        std::vector<double> vec;
+        for(k = 0; k < M; k++) {
+            tmp = k * interval;
+            if (C[i] <= tmp && tmp <= C[i+1]) {
+                vec.push_back( (tmp - C[i]) / (C[i+1] - C[i]) );
+            } else if (C[i+1] <= tmp && tmp <= C[i+2]) {
+                vec.push_back( (C[i+2] - tmp) / (C[i+2] - C[i+1]) );
+            } else {
+                vec.push_back(0.);
+            }
+        }
+        ret.push_back( vec );
+    }
+    return ret;
+}
+
+void MFCC::initialize(int duration, int filtersCount, int mfccCount)
 {
     mFiltersCount = filtersCount;
     mMfccCount    = mfccCount;
-    mWindowSize   = windowSize;
-    mOverlapSize  = overlapSize;
+    mDuration     = duration;
     mStream       = nullptr;
+    mFftSize      = 0;
 }
 
 //private:

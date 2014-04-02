@@ -4,11 +4,14 @@
 #include <string>
 #include <vector>
 #include <complex>
-#include <fftw3.h>
+#include <fftw3.h>      // FFT and DCT transform
+//#include <Eigen/Dense>  // Matrix logic
 #include <iostream> // TODO: remove
 #include <math.h>
 #include "signal.h"
 #define Malloc(type,n) (type *)fftw_malloc((n)*sizeof(type)) // from svm_train.c
+
+using vector2d = std::vector< std::vector<double> >;
 
 class MFCC
 {
@@ -17,7 +20,7 @@ public:
     friend class MFCCTest;
     #endif
 
-    MFCC(int windowSize = 512, int overlapSize = 256, int filtersCount = 32, int mfccCount = 16);
+    MFCC(int duration = 30, int filtersCount = 32, int mfccCount = 16);
     virtual ~MFCC();
 
     /**
@@ -30,27 +33,33 @@ public:
      * @brief extract MFCC features
      * @return 
      */
-    std::vector< std::vector<double> > extract();
+    vector2d extract();
 
-protected:
+//protected:
     double hzToMel(double hz);
     double melToHz(double mel);
     
     /**
-     * @brief Split stram by ms and apply DFT based on libFFTW3
+     * @brief Split stram by interval ms and apply DFT based on libFFTW3
      * @param ms as frame length in ms
-     * @return complex vectors
+     * @return spectral flatness energy
      */
-    std::vector< std::vector< std::complex<double> > > dft(unsigned int ms=20);
+    vector2d dft();
     
-    void initialize(int windowSize, int overlapSize, int filtersCount, int mfccCount);
+    /**
+     * @brief get triangle filter coefficients
+     * @return filtersCount*mFftSize/2
+     */
+    vector2d trifBank();
+    
+    void initialize(int duration, int filtersCount, int mfccCount);
 
 private:
     Signal * mStream;
     size_t   mFiltersCount;
     size_t   mMfccCount;
-    size_t   mWindowSize;
-    size_t   mOverlapSize;
+    size_t   mDuration;
+    size_t   mFftSize;
 };
 
 #endif // MFCC_H

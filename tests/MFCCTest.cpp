@@ -18,7 +18,7 @@ MFCCTest::~MFCCTest() {
 
 void MFCCTest::setUp() {
     mfcc = new MFCC();
-    mfcc->load("tests/fixtures/voice1.wav");
+    mfcc->load("tests/fixtures/mike.wav");
 }
 
 void MFCCTest::tearDown() {
@@ -26,65 +26,68 @@ void MFCCTest::tearDown() {
 }
 
 void MFCCTest::testInitialize() {
-    CPPUNIT_ASSERT(mfcc->mWindowSize   == 512);
-    CPPUNIT_ASSERT(mfcc->mOverlapSize  == 256);
+    CPPUNIT_ASSERT(mfcc->mDuration     == 30);
     CPPUNIT_ASSERT(mfcc->mFiltersCount == 32);
     CPPUNIT_ASSERT(mfcc->mMfccCount    == 16);
     CPPUNIT_ASSERT(mfcc->mStream       != nullptr);
-    CPPUNIT_ASSERT(mfcc->mStream->getSampleRate() == 9600);
+    CPPUNIT_ASSERT(mfcc->mStream->getSampleRate() == 22050);
 }
 
 void MFCCTest::testExtract() {
-    CPPUNIT_ASSERT(mfcc->mStream->getSampleRate() == 9600);
+    std::string filename = "gnuplot_mfcc";
+    int duration = 30;
+    auto out = mfcc->extract();
+    std::vector<float> x, y;
+    int i;
+    float t;
     
-//    auto features = mfcc->extract();
-//    
-//    CPPUNIT_ASSERT(features.size() != 0);
-//    for(auto feature: features) {
-//        CPPUNIT_ASSERT(feature.size() == 16);
-//    }
+    for(i = 0; i < out.size(); i++)
+        x.push_back( i*duration / 1000. );
+    for(i = 0; i < out.back().size(); i++)
+        y.push_back( i );
+    
+    TestHelper::saveMatrix(out, x, y, filename);
+    TestHelper::plotMatrix(filename);
 }
 
 void MFCCTest::testDFT() {
     std::string filename = "gnuplot_fft";
-    int ms = 20;
-    auto dft = mfcc->dft(ms);
-    int i = 0;
-    float t = 0;
-    float n = dft.size();
-    float hzInterval = 1000.0 / ms;
+    int duration = 30;
+    float hzInterval = 1000.0 / duration;
+    auto dft = mfcc->dft();
+    std::vector<float> x, y;
+    int i;
+    float t;
     
-    FILE * file = fopen((filename + ".dat").data(), "wb");
-    fwrite(&n, sizeof(float), 1, file);
-    for(i = 0; i < dft.size(); i++) {
-        fwrite(&t, sizeof(float), 1, file);
-        t += ms / 1000.0;
-    }
-    t = 0;
-    for(i = 0; i < dft[0].size(); i++) {
-        fwrite(&t, sizeof(float), 1, file);
-        t = (i+1) * hzInterval;
-        for(auto list : dft) {
-            float val = std::abs(list[i]);
-            fwrite(&val, sizeof(float), 1, file);
-        }
-    }
-    fclose(file);
-    try {
-        Gnuplot g;
-        g.cmd("set terminal png size 1920, 1080");
-        g.cmd(("set output \"" + filename + ".png\""));
-        g.cmd( ("plot \"" + filename + ".dat\" binary matrix with image") );
-    } catch (GnuplotException ge) {
-        std::cout << ge.what() << std::endl;
-    }
+    for(i = 0; i < dft.size(); i++)
+        x.push_back( i*duration / 1000. );
+    for(i = 0; i < dft.back().size(); i++)
+        y.push_back( i*hzInterval );
     
+    TestHelper::saveMatrix(dft, x, y, filename);
+    TestHelper::plotMatrix(filename);
     /* FIXME: need to remove after plot*/
 //    remove((filename + ".dat").data());
 }
 
+void MFCCTest::testTrifBank() {
+    std::string filename = "gnuplot_trifbank";
+    auto tb = mfcc->trifBank();
+    float hzInterval = 1000.0 / 30.0;
+    std::vector<float> x, y;
+    float t;
+    int i;
+    
+    for(i = 0; i < tb.back().size(); i++) {
+        x.push_back( i*hzInterval );
+    }
+    
+    TestHelper::savePoints(tb, x, filename);
+    TestHelper::plotPoints(filename);
+}
+
 void MFCCTest::testSignalRead() {
-    FILE* file = fopen("tests/fixtures/matlab/voice1.pcm", "rb");
+    FILE* file = fopen("tests/fixtures/matlab/mike.pcm", "rb");
     double* val = new double;
     double* matlabVal = new double;
     mfcc->mStream->rewind();

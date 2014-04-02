@@ -14,17 +14,17 @@ class MFCCTest;
 #include <cppunit/extensions/HelperMacros.h>
 #include <iostream>
 #include <math.h>
+#include "test_helper.h"
 #include "mfcc.h"
-#include "../vendor/gnuplot.hpp";
-//#include "vendor/gnuplot.hpp";
 
 class MFCCTest : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST_SUITE(MFCCTest);
 
     CPPUNIT_TEST(testInitialize);
     CPPUNIT_TEST(testSignalRead);
-    CPPUNIT_TEST(testExtract);
     CPPUNIT_TEST(testDFT);
+    CPPUNIT_TEST(testTrifBank);
+    CPPUNIT_TEST(testExtract);
 
     CPPUNIT_TEST_SUITE_END();
 
@@ -41,6 +41,7 @@ private:
     void testSignalRead();
     void testExtract();
     void testDFT();
+    void testTrifBank();
 };
 
 #endif	/* MFCCTEST_H */

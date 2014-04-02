@@ -39,7 +39,7 @@ $(EXECUTABLE): main.o $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -rf $(EXECUTABLE) main.o $(OBJECTS) $(TESTS) $(TEST_OBJ) cppunitresults.xml gnuplot_*
+	rm -rf $(EXECUTABLE) main.o $(OBJECTS) $(TESTS) $(TEST_OBJ) cppunitresults.xml gnuplot_* *.gz out*
 
 
 ### NetBeans autogenerate
