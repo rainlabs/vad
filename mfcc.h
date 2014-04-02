@@ -11,7 +11,7 @@
 #include "signal.h"
 #define Malloc(type,n) (type *)fftw_malloc((n)*sizeof(type)) // from svm_train.c
 
-using vector2d = std::vector< std::vector<double> >;
+typedef std::vector< std::vector<double> > vector2d;
 
 class MFCC
 {

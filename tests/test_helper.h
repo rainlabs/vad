@@ -13,7 +13,7 @@
 #include <fstream>
 #include "../vendor/gnuplot.hpp";
 
-using vector2d = std::vector< std::vector<double> >;
+typedef std::vector< std::vector<double> > vector2d;
 
 class TestHelper {
 public:
