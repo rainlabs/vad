@@ -52,6 +52,8 @@ public:
      */
     vector2d trifBank();
     
+    std::vector<double> dct(std::vector<double> x);
+    
     void initialize(int duration, int filtersCount, int mfccCount);
 
 private:
@@ -60,6 +62,7 @@ private:
     size_t   mMfccCount;
     size_t   mDuration;
     size_t   mFftSize;
+    size_t   mOverlapSize;
 };
 
 #endif // MFCC_H

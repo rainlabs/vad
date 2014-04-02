@@ -35,7 +35,7 @@ void MFCCTest::testInitialize() {
 
 void MFCCTest::testExtract() {
     std::string filename = "gnuplot_mfcc";
-    int duration = 30;
+    int duration = 15;
     auto out = mfcc->extract();
     std::vector<float> x, y;
     int i;
@@ -43,6 +43,7 @@ void MFCCTest::testExtract() {
     
     for(i = 0; i < out.size(); i++)
         x.push_back( i*duration / 1000. );
+    std::cout << x.back() << std::endl;
     for(i = 0; i < out.back().size(); i++)
         y.push_back( i );
     
@@ -52,7 +53,7 @@ void MFCCTest::testExtract() {
 
 void MFCCTest::testDFT() {
     std::string filename = "gnuplot_fft";
-    int duration = 30;
+    int duration = 15;
     float hzInterval = 1000.0 / duration;
     auto dft = mfcc->dft();
     std::vector<float> x, y;

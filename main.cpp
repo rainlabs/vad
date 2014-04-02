@@ -4,14 +4,15 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2)
-        return 1;
+//    if (argc < 2)
+//        return 1;
     MFCC* mfcc = new MFCC();
     int i;
     int duration = 30;
     float hzInterval = 1000. / duration;
     std::string filename = "out";
-    mfcc->load(argv[1]);
+//    mfcc->load(argv[1]);
+    mfcc->load("tests/fixtures/mike.wav");
     auto out = mfcc->extract();
     
     std::vector<float> x, y;
