@@ -1690,13 +1690,13 @@ void Gnuplot::init()
     // Retrieves a C string containing the value of the environment variable 
     // whose name is specified as argument.  If the requested variable is not 
     // part of the environment list, the function returns a NULL pointer.
-#if ( defined(unix) || defined(__unix) || defined(__unix__) ) && !defined(__APPLE__)
-    if (getenv("DISPLAY") == NULL)
-    {
-        valid = false;
-        throw GnuplotException("Can't find DISPLAY variable");
-    }
-#endif
+//#if ( defined(unix) || defined(__unix) || defined(__unix__) ) && !defined(__APPLE__)
+//    if (getenv("DISPLAY") == NULL)
+//    {
+//        valid = false;
+//        throw GnuplotException("Can't find DISPLAY variable");
+//    }
+//#endif
 
 
     // if gnuplot not available
@@ -1738,7 +1738,8 @@ void Gnuplot::init()
     smooth = "";
 
     //set terminal type
-    showonscreen();
+//    showonscreen();
+    cmd("set terminal png size 1920, 1080");
 
     return;
 }

@@ -25,7 +25,7 @@ $(TESTS): $(TEST_OBJ)
 	$(CXX) $(LDFLAGS) -lcppunit $(TEST_OBJ) -o $@
 ###
 
-all: release build-tests test
+all: release build-tests test gz
 release: main.cpp $(SOURCES) $(EXECUTABLE)
 debug: release
 build-tests: $(TEST_SRC) $(TESTS)
@@ -40,6 +40,9 @@ $(EXECUTABLE): main.o $(OBJECTS)
 
 clean:
 	rm -rf $(EXECUTABLE) main.o $(OBJECTS) $(TESTS) $(TEST_OBJ) cppunitresults.xml gnuplot_* *.gz out*
+
+gz:
+	tar czvf tests.tar.gz gnuplot_*
 
 
 ### NetBeans autogenerate
