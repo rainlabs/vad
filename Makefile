@@ -8,6 +8,12 @@ HEADERS    = signal.h window.h c_svm.h mfcc.h
 OBJECTS    = $(SOURCES:.cpp=.o)
 BUILDDIR   = build
 EXECUTABLE = vad
+MFCC_SOURCES = mfcc_main.cpp signal.cpp window.cpp mfcc.cpp
+MFCC_OBJECTS = $(MFCC_SOURCES:.cpp=.o)
+MFCC_EXECUTABLE = mfcc
+AMFCC_SOURCES = aquila_mfcc.cpp
+AMFCC_OBJECTS = $(AMFCC_SOURCES:.cpp=.o)
+AMFCC = amfcc
 
 ### Debug ENVIRONMENT
 debug: CXX += -DDEBUG -g
@@ -27,7 +33,10 @@ $(TESTS): $(TEST_OBJ)
 
 all: release build-tests test gz
 release: main.cpp $(SOURCES) $(EXECUTABLE)
-debug: release
+mfcc: $(MFCC_SOURCES) $(MFCC_EXECUTABLE)
+amfcc: $(AMFCC_SOURCES) $(AMFCC)
+m: mfcc mfcc
+debug: mfcc
 build-tests: $(TEST_SRC) $(TESTS)
 test:
 	./vad_test
@@ -35,11 +44,17 @@ test:
 $(EXECUTABLE): main.o $(OBJECTS)
 	$(CXX) $(LDFLAGS) main.o $(OBJECTS) -o $@
 
+$(MFCC_EXECUTABLE): $(MFCC_OBJECTS)
+	$(CXX) -lsndfile -lfftw3 -lm $(MFCC_OBJECTS) -o $@
+
+$(AMFCC): $(AMFCC_OBJECTS)
+	$(CXX) -lsfml-audio $(AMFCC_OBJECTS) -o $@ -rdynamic -lAquila -lOoura_fft
+
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -rf $(EXECUTABLE) main.o $(OBJECTS) $(TESTS) $(TEST_OBJ) cppunitresults.xml gnuplot_* *.gz out*
+	rm -rf $(EXECUTABLE) main.o $(OBJECTS) $(TESTS) $(TEST_OBJ) $(MFCC_EXECUTABLE) $(MFCC_OBJECTS) $(AMFCC) $(AMFCC_OBJECTS) cppunitresults.xml gnuplot_* *.gz out*
 
 gz:
 	tar czvf tests.tar.gz gnuplot_*

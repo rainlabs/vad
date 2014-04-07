@@ -21,3 +21,6 @@ cppunitresults.xml
 
 # netbeans
 nbproject/
+
+# results
+result/

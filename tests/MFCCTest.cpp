@@ -18,7 +18,7 @@ MFCCTest::~MFCCTest() {
 
 void MFCCTest::setUp() {
     mfcc = new MFCC();
-    mfcc->load("tests/fixtures/mike.wav");
+    mfcc->load("tests/fixtures/voice1.wav");
 }
 
 void MFCCTest::tearDown() {
@@ -35,8 +35,8 @@ void MFCCTest::testInitialize() {
 
 void MFCCTest::testExtract() {
     std::string filename = "gnuplot_mfcc";
-    int duration = 15;
-    auto out = mfcc->extract();
+    int duration = mfcc->mDuration / 2;
+    auto out = mfcc->dftOnTrifBank();
     std::vector<float> x, y;
     int i;
     float t;
@@ -53,12 +53,18 @@ void MFCCTest::testExtract() {
 
 void MFCCTest::testDFT() {
     std::string filename = "gnuplot_fft";
-    int duration = 15;
+    int duration = mfcc->mDuration / 2;
     float hzInterval = 1000.0 / duration;
     auto dft = mfcc->dft();
     std::vector<float> x, y;
     int i;
     float t;
+    
+    for(i = 0; i < dft.size(); i++) {
+        for(int j = 0; j < dft[i].size(); j++) {
+            dft[i][j] = log(dft[i][j]);
+        }
+    }
     
     for(i = 0; i < dft.size(); i++)
         x.push_back( i*duration / 1000. );
@@ -74,7 +80,7 @@ void MFCCTest::testDFT() {
 void MFCCTest::testTrifBank() {
     std::string filename = "gnuplot_trifbank";
     auto tb = mfcc->trifBank();
-    float hzInterval = 1000.0 / 30.0;
+    float hzInterval = 1000.0 / mfcc->mDuration;
     std::vector<float> x, y;
     float t;
     int i;

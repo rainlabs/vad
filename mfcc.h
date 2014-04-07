@@ -1,14 +1,16 @@
-#ifndef MFCC_H
-#define MFCC_H
+#ifndef VMFCC_H
+#define VMFCC_H
 
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <complex>
 #include <fftw3.h>      // FFT and DCT transform
 //#include <Eigen/Dense>  // Matrix logic
 #include <iostream> // TODO: remove
 #include <math.h>
 #include "signal.h"
+#include "window.h"
 #define Malloc(type,n) (type *)fftw_malloc((n)*sizeof(type)) // from svm_train.c
 
 typedef std::vector< std::vector<double> > vector2d;
@@ -20,7 +22,13 @@ public:
     friend class MFCCTest;
     #endif
 
-    MFCC(int duration = 30, int filtersCount = 32, int mfccCount = 16);
+    enum WINDOW {
+        HAMMING,
+        BLACKMAN_HARRIS,
+        HANN
+    };
+
+    MFCC(int duration = 30, int overlap = 15, int filtersCount = 24, int mfccCount = 16, int window = 0);
     virtual ~MFCC();
 
     /**
@@ -34,6 +42,12 @@ public:
      * @return 
      */
     vector2d extract();
+    
+    /**
+     * @brief dft * trifBank
+     * @return preMFCC
+     */
+    vector2d dftOnTrifBank();
 
 //protected:
     double hzToMel(double hz);
@@ -54,7 +68,9 @@ public:
     
     std::vector<double> dct(std::vector<double> x);
     
-    void initialize(int duration, int filtersCount, int mfccCount);
+protected:
+    
+    void initialize(int duration, int overlap, int filtersCount, int mfccCount, int window);
 
 private:
     Signal * mStream;
@@ -63,6 +79,7 @@ private:
     size_t   mDuration;
     size_t   mFftSize;
     size_t   mOverlapSize;
+    int      mWindowType;
 };
 
-#endif // MFCC_H
+#endif // VMFCC_H
