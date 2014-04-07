@@ -148,8 +148,8 @@ vector2d MFCC::dft() {
 }
 
 vector2d MFCC::trifBank() {
-    float fLow = hzToMel(300.0);
-    float fHigh = hzToMel(3700.0);
+    float fLow = hzToMel(0.0);
+    float fHigh = hzToMel(4000.0);
 //    float fHigh = hzToMel(mStream->getSampleRate() / 2.);
     int M = mFftSize / 2;
     std::vector< double > C;
